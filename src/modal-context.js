@@ -84,6 +84,7 @@ export function ModalProvider({ children }) {
             display: 'flex',
             justifyContent: 'center',
             paddingTop: '20vh',
+            boxSizing: 'border-box',
           }}
           ref={containerNodeRef}
           onClick={handleBackgroundClick}
