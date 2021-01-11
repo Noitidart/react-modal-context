@@ -15,14 +15,14 @@ export function ModalProvider({ children }) {
     if (!opened) {
       return;
     }
-    opened.resolve({ didCancel: true, didConfirm: false });
+    opened.resolve({ canceled: true, confirmed: false });
     setOpened(null);
   };
   const confirm = (value) => {
     if (!opened) {
       return;
     }
-    opened.resolve({ value, didCancel: false, didConfirm: true });
+    opened.resolve({ value, canceled: false, confirmed: true });
     setOpened(null);
   };
 
