@@ -1,70 +1,65 @@
-# Getting Started with Create React App
+## `react-modal-context`
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### Usage
 
-## Available Scripts
+1. Wrap your application in `<ModalProvider>`
 
-In the project directory, you can run:
+   ```diff
+   +import { ModalProvider } from './modal-context';
 
-### `npm start`
+   function Root(props) {
+     return (
+   +   <ModalProvider>
+         <App />
+   +   </ModalProvider>
+     )
+   }
+   ```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+2. Render the `<ModalContainer>` component in your application
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+   ```diff
+   function App(props) {
+   + const modal = useModal();
 
-### `npm test`
+     return (
+   +   <>
+         <div className="App" />
+   +      <modal.ModalContainer />
+   +   </>
+     )
+   }
+   ```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. Create a modal dialog component. This is defined as a component that calls `modal.cancel()` and/or `modal.confirm()`
 
-### `npm run build`
+   ```
+   function AlertModal() {
+     const modal = useModal();
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+     return (
+       <div>
+         <p>
+           This is an alert message.
+         </p>
+         <button type="button" onClick={() => modal.confirm()}>Confirm</button>
+       </div>
+     )
+   }
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. Open your modal from any method with `modal.open`.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+   ```
+   function AlertButton() {
+     const modal = useModal();
 
-### `npm run eject`
+     const showAlert = async () => {
+       const result = await modal.open(<AlertModal />);
+     }
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+     return (
+       <button type="button" onClick={showAlert}>Show Alert</button>
+     )
+   }
+   ```
