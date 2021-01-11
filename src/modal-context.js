@@ -5,6 +5,7 @@ import React, {
   useContext,
   useRef,
 } from 'react';
+import { RemoveScrollBar } from 'react-remove-scroll-bar';
 
 const ModalContext = createContext();
 
@@ -50,20 +51,12 @@ export function ModalProvider({ children }) {
         }
       };
       document.addEventListener('keyup', savedHandleEscapePressed.current);
-      document.body.style.overflow = 'hidden';
-      if (isVerticalScrollbarVisible()) {
-        document.body.style.paddingRight = getScrollbarWidth() + 'px';
-      }
       return () => {
         document.removeEventListener('keyup', savedHandleEscapePressed.current);
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
       };
     } else {
       if (savedHandleEscapePressed.current) {
         document.removeEventListener('keyup', savedHandleEscapePressed.current);
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
       }
     }
   }, [opened?.resolve]);
@@ -97,6 +90,7 @@ export function ModalProvider({ children }) {
           ref={containerNodeRef}
           onClick={handleBackgroundClick}
         >
+          <RemoveScrollBar />
           {dialogNode}
         </div>
       );
@@ -125,36 +119,4 @@ export function useModal() {
     throw new Error('useModal must be used within a ModalProvider');
   }
   return context;
-}
-
-function isVerticalScrollbarVisible() {
-  return (
-    document.documentElement.scrollHeight >
-    document.documentElement.clientHeight
-  );
-}
-
-let scrollbarWidthCached;
-function getScrollbarWidth() {
-  if (scrollbarWidthCached) {
-    return scrollbarWidthCached;
-  }
-  // Creating invisible container
-  const outer = document.createElement('div');
-  outer.style.visibility = 'hidden';
-  outer.style.overflow = 'scroll'; // forcing scrollbar to appear
-  outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
-  document.body.appendChild(outer);
-
-  // Creating inner element and placing it in the container
-  const inner = document.createElement('div');
-  outer.appendChild(inner);
-
-  // Calculating difference between container's full width and the child width
-  const scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
-
-  // Removing temporary elements from the DOM
-  outer.parentNode.removeChild(outer);
-
-  return scrollbarWidth;
 }
