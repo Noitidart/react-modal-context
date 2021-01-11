@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import { useModal, ModalAction } from './modal-context';
+import { useModal } from './modal-context';
 import AlertModal from './AlertModal';
 import RemoteDropdownModal from './RemoteDropdownModal';
 
@@ -10,10 +10,7 @@ function App() {
   const handleOpenAlertModal = async (e) => {
     e.preventDefault();
     const result = await modal.open(<AlertModal message="Hi" />);
-    console.log(
-      'Did press confirm on AlertModal:',
-      result.action === ModalAction.CONFIRM
-    );
+    console.log('Did press confirm on AlertModal:', result.didConfirm);
   };
 
   const handleOpenRemoteDropdownModal = async (e) => {
@@ -21,7 +18,7 @@ function App() {
     const modalResult = await modal.open(
       <RemoteDropdownModal url="https://duckduckgo.com/" />
     );
-    if (modalResult.action === ModalAction.CONFIRM) {
+    if (modalResult.didConfirm) {
       console.log('Your selected country:', modalResult.value);
     } else {
       console.log('You cancelled the dialog');

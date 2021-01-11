@@ -8,11 +8,6 @@ import React, {
 
 const ModalContext = createContext();
 
-export const ModalAction = {
-  CANCEL: 'CANCEL',
-  CONFIRM: 'CONFIRM',
-};
-
 export function ModalProvider({ children }) {
   const [opened, setOpened] = useState(false);
 
@@ -20,14 +15,14 @@ export function ModalProvider({ children }) {
     if (!opened) {
       return;
     }
-    opened.resolve({ action: ModalAction.CANCEL });
+    opened.resolve({ didCancel: true, didConfirm: false });
     setOpened(null);
   };
   const confirm = (value) => {
     if (!opened) {
       return;
     }
-    opened.resolve({ value, action: ModalAction.CONFIRM });
+    opened.resolve({ value, didCancel: false, didConfirm: true });
     setOpened(null);
   };
 
