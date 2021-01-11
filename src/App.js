@@ -46,6 +46,7 @@ function App() {
             </a>
           </p>
         </header>
+        <div style={{ backgroundColor: 'midnightblue', height: '300px' }} />
       </div>
       <modal.ModalContainer />
     </>
