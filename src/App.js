@@ -10,7 +10,7 @@ function App() {
   const handleOpenAlertModal = async (e) => {
     e.preventDefault();
     const result = await modal.open(<AlertModal message="Hi" />);
-    console.log('Did press confirm on AlertModal:', result.didConfirm);
+    console.log('Did press confirm on AlertModal:', result.confirmed);
   };
 
   const handleOpenRemoteDropdownModal = async (e) => {
@@ -18,7 +18,7 @@ function App() {
     const modalResult = await modal.open(
       <RemoteDropdownModal url="https://duckduckgo.com/" />
     );
-    if (modalResult.didConfirm) {
+    if (modalResult.confirmed) {
       console.log('Your selected country:', modalResult.value);
     } else {
       console.log('You cancelled the dialog');
