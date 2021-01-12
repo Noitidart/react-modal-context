@@ -6,6 +6,7 @@ import React, {
   useRef,
 } from 'react';
 import { RemoveScrollBar } from 'react-remove-scroll-bar';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const ModalContext = createContext();
 
@@ -16,6 +17,7 @@ export function ModalProvider({ children }) {
   const stableFinalizers = useRef(null);
 
   const stableUpdaters = useRef({
+    animationDuration: 0.15,
     cancel: () => {
       const opened = Boolean(stableFinalizers.current);
 
@@ -81,48 +83,11 @@ export function ModalProvider({ children }) {
     }
   }, [opened]);
 
-  const ModalContainer = () => {
-    const containerNodeRef = useRef();
-
-    if (opened) {
-      function handleBackgroundClick(e) {
-        if (e.target === containerNodeRef.current) {
-          stableUpdaters.current.cancel();
-        }
-      }
-
-      return (
-        <div
-          style={{
-            height: '100vh',
-            width: '100vw',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            zIndex: 1000,
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            display: 'flex',
-            justifyContent: 'center',
-            paddingTop: '20vh',
-            boxSizing: 'border-box',
-          }}
-          ref={containerNodeRef}
-          onClick={handleBackgroundClick}
-        >
-          <RemoveScrollBar />
-          {dialog}
-        </div>
-      );
-    } else {
-      return null;
-    }
-  };
-
   return (
     <ModalContext.Provider value={stableUpdaters.current}>
       <>
         {children}
-        <ModalContainer />
+        <ModalContainer opened={opened} dialog={dialog} />
       </>
     </ModalContext.Provider>
   );
@@ -134,4 +99,53 @@ export function useModal() {
     throw new Error('useModal must be used within a ModalProvider');
   }
   return context;
+}
+
+function ModalContainer(props) {
+  const [visible, setVisible] = useState(props.opened);
+  const modal = useModal();
+  useEffect(() => {
+    if (props.opened) {
+      setVisible(true);
+    } else {
+      setVisible(false);
+    }
+  }, [props.opened]);
+  const containerNodeRef = useRef();
+
+  function handleBackgroundClick(e) {
+    if (e.target === containerNodeRef.current) {
+      modal.cancel();
+    }
+  }
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          animate={{ opacity: 1 }}
+          initial={{ opacity: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: modal.animationDuration }}
+          style={{
+            height: '100vh',
+            width: '100vw',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 1000,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            justifyContent: 'center',
+            boxSizing: 'border-box',
+          }}
+          ref={containerNodeRef}
+          onClick={handleBackgroundClick}
+        >
+          <RemoveScrollBar />
+          <AnimatePresence>{props.opened && props.dialog}</AnimatePresence>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 }

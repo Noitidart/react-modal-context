@@ -1,4 +1,5 @@
 import { useModal } from './modal-context';
+import { motion } from 'framer-motion';
 
 /**
  *
@@ -9,8 +10,16 @@ export default function AlertModal(props) {
   const modal = useModal();
 
   return (
-    <div
-      style={{ width: '400px', height: '300px', backgroundColor: 'steelblue' }}
+    <motion.div
+      animate={{ y: 16 }}
+      exit={{ y: 0 }}
+      transition={{ duration: modal.animationDuration }}
+      style={{
+        marginTop: '20vh',
+        width: '400px',
+        height: '300px',
+        backgroundColor: 'steelblue',
+      }}
     >
       {props.message}
       <button type="button" onClick={modal.cancel}>
@@ -19,6 +28,6 @@ export default function AlertModal(props) {
       <button type="button" onClick={() => modal.confirm()}>
         Confirm
       </button>
-    </div>
+    </motion.div>
   );
 }
