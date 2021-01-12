@@ -5,7 +5,6 @@ import AlertModal from './AlertModal';
 import RemoteDropdownModal from './RemoteDropdownModal';
 
 function App() {
-  const ModalContainer = useModalContainer();
   const modal = useModal();
 
   const handleOpenAlertModal = async (e) => {
@@ -27,30 +26,27 @@ function App() {
   };
 
   return (
-    <>
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            <code>ModalContext</code> Demo
-          </p>
-          <p>
-            <a className="App-link" href="#" onClick={handleOpenAlertModal}>
-              Show Alert
-            </a>
-            <a
-              className="App-link"
-              href="#"
-              onClick={handleOpenRemoteDropdownModal}
-            >
-              Show Remote Dropdown
-            </a>
-          </p>
-        </header>
-        <div style={{ backgroundColor: 'midnightblue', height: '300px' }} />
-      </div>
-      <ModalContainer />
-    </>
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          <code>ModalContext</code> Demo
+        </p>
+        <p>
+          <a className="App-link" href="#" onClick={handleOpenAlertModal}>
+            Show Alert
+          </a>
+          <a
+            className="App-link"
+            href="#"
+            onClick={handleOpenRemoteDropdownModal}
+          >
+            Show Remote Dropdown
+          </a>
+        </p>
+      </header>
+      <div style={{ backgroundColor: 'midnightblue', height: '300px' }} />
+    </div>
   );
 }
 

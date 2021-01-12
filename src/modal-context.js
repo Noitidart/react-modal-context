@@ -7,8 +7,7 @@ import React, {
 } from 'react';
 import { RemoveScrollBar } from 'react-remove-scroll-bar';
 
-const ModalContainerContext = createContext();
-const ModalUpdatersContext = createContext();
+const ModalContext = createContext();
 
 export function ModalProvider({ children }) {
   const [dialog, setDialog] = useState(null);
@@ -120,24 +119,17 @@ export function ModalProvider({ children }) {
   };
 
   return (
-    <ModalContainerContext.Provider value={ModalContainer}>
-      <ModalUpdatersContext.Provider value={stableUpdaters.current}>
+    <ModalContext.Provider value={stableUpdaters.current}>
+      <>
         {children}
-      </ModalUpdatersContext.Provider>
-    </ModalContainerContext.Provider>
+        <ModalContainer />
+      </>
+    </ModalContext.Provider>
   );
 }
 
-export function useModalContainer() {
-  const context = useContext(ModalContainerContext);
-  if (context === undefined) {
-    throw new Error('useModalContainer must be used within a ModalProvider');
-  }
-  return context;
-}
-
 export function useModal() {
-  const context = useContext(ModalUpdatersContext);
+  const context = useContext(ModalContext);
   if (context === undefined) {
     throw new Error('useModal must be used within a ModalProvider');
   }

@@ -16,22 +16,7 @@
    }
    ```
 
-2. Render the `<ModalContainer>` component in your application
-
-   ```diff
-   function App(props) {
-   + const modal = useModalContainer();
-
-     return (
-   +   <>
-         <div className="App" />
-   +      <ModalContainer />
-   +   </>
-     )
-   }
-   ```
-
-3. Create a modal dialog component. This is defined as a component that calls `modal.cancel()` and/or `modal.confirm()`
+2. Create a modal dialog component. This is defined as a component that calls `modal.cancel()` and/or `modal.confirm()`
 
    ```
    function AlertModal() {
@@ -48,7 +33,7 @@
    }
    ```
 
-4. Open your modal from any method with `modal.open`.
+3. Open your modal from any method with `modal.open`.
 
    ```
    function AlertButton() {
