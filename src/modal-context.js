@@ -10,65 +10,93 @@ import { RemoveScrollBar } from 'react-remove-scroll-bar';
 const ModalContext = createContext();
 
 export function ModalProvider({ children }) {
-  const [opened, setOpened] = useState(false);
+  const [dialog, setDialog] = useState(null);
+  const opened = Boolean(dialog);
 
-  const cancel = () => {
-    if (!opened) {
-      return;
-    }
-    opened.resolve({ canceled: true, confirmed: false });
-    setOpened(null);
-  };
-  const confirm = (value) => {
-    if (!opened) {
-      return;
-    }
-    opened.resolve({ value, canceled: false, confirmed: true });
-    setOpened(null);
-  };
+  const stableFinalizers = useRef(null);
 
-  const open = async (dialogNode) => {
-    if (opened) {
-      setOpened({ ...opened, dialogNode });
-      return opened.promise;
-    }
-    let resolve;
-    const promise = new Promise((r) => {
-      resolve = r;
-    });
-    setOpened({ promise, resolve, dialogNode });
-    return promise;
-  };
+  const stableUpdaters = useRef({
+    cancel: () => {
+      const opened = Boolean(stableFinalizers.current);
+
+      if (!opened) {
+        return;
+      }
+      stableFinalizers.current.resolve({ canceled: true, confirmed: false });
+      stableFinalizers.current = null;
+      setDialog(null);
+    },
+
+    confirm: (value) => {
+      const opened = Boolean(stableFinalizers.current);
+
+      if (!opened) {
+        return;
+      }
+      stableFinalizers.current.resolve({
+        value,
+        canceled: false,
+        confirmed: true,
+      });
+      stableFinalizers.current = null;
+      setDialog(null);
+    },
+
+    open: async (dialog) => {
+      const opened = Boolean(stableFinalizers.current);
+
+      if (opened) {
+        setDialog(dialog);
+        return stableFinalizers.current.promise;
+      }
+
+      let resolve;
+      const promise = new Promise((r) => {
+        resolve = r;
+      });
+
+      stableFinalizers.current = { promise, resolve };
+
+      setDialog(dialog);
+
+      return promise;
+    },
+
+    handleEscapePress: (e) => {
+      if (e.code === 'Escape') {
+        e.preventDefault();
+        stableUpdaters.current.cancel();
+      }
+    },
+  });
 
   // add/remove escape key listener when modal is shown/hidden
-  const savedHandleEscapePressed = useRef(null);
   useEffect(() => {
-    if (opened?.resolve) {
-      savedHandleEscapePressed.current = (e) => {
-        if (e.code === 'Escape') {
-          e.preventDefault();
-          cancel();
-        }
-      };
-      document.addEventListener('keyup', savedHandleEscapePressed.current);
+    if (opened) {
+      document.addEventListener(
+        'keyup',
+        stableUpdaters.current.handleEscapePress
+      );
       return () => {
-        document.removeEventListener('keyup', savedHandleEscapePressed.current);
+        document.removeEventListener(
+          'keyup',
+          stableUpdaters.current.handleEscapePress
+        );
       };
     } else {
-      if (savedHandleEscapePressed.current) {
-        document.removeEventListener('keyup', savedHandleEscapePressed.current);
-      }
+      document.removeEventListener(
+        'keyup',
+        stableUpdaters.current.handleEscapePress
+      );
     }
-  }, [opened?.resolve]);
+  }, [opened]);
 
   const ModalContainer = () => {
     const containerNodeRef = useRef();
     if (opened) {
-      const { dialogNode } = opened;
-
       function handleBackgroundClick(e) {
         if (e.target === containerNodeRef.current) {
-          cancel();
+          stableUpdaters.current.cancel();
         }
       }
 
@@ -91,7 +119,7 @@ export function ModalProvider({ children }) {
           onClick={handleBackgroundClick}
         >
           <RemoveScrollBar />
-          {dialogNode}
+          {dialog}
         </div>
       );
     } else {
@@ -103,9 +131,9 @@ export function ModalProvider({ children }) {
     <ModalContext.Provider
       value={{
         ModalContainer,
-        open,
-        cancel,
-        confirm,
+        open: stableUpdaters.current.open,
+        cancel: stableUpdaters.current.cancel,
+        confirm: stableUpdaters.current.confirm,
       }}
     >
       {children}
