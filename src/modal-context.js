@@ -143,6 +143,12 @@ function ModalContainer(props) {
           onClick={handleBackgroundClick}
         >
           <RemoveScrollBar />
+          {/* AnimatePresence will keep the dialog around visible,
+              when props.opened/props.dialog go falsy, if props.dialog
+              is not a motion.div - this is good, i dont want the
+              non-animated dialog disappearing while the container
+              fades out
+          */}
           <AnimatePresence>{props.opened && props.dialog}</AnimatePresence>
         </motion.div>
       )}
