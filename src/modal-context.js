@@ -10,14 +10,18 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 const ModalContext = createContext();
 
-export function ModalProvider({ children }) {
+export function ModalProvider({
+  children,
+  backgroundColor = 'rgba(0, 0, 0, 0.7)',
+  animationDuration = 0.15,
+}) {
   const [dialog, setDialog] = useState(null);
   const opened = Boolean(dialog);
 
   const stableFinalizers = useRef(null);
 
   const stableUpdaters = useRef({
-    animationDuration: 0.15,
+    animationDuration,
     cancel: () => {
       const opened = Boolean(stableFinalizers.current);
 
@@ -87,7 +91,11 @@ export function ModalProvider({ children }) {
     <ModalContext.Provider value={stableUpdaters.current}>
       <>
         {children}
-        <ModalContainer opened={opened} dialog={dialog} />
+        <ModalContainer
+          opened={opened}
+          dialog={dialog}
+          backgroundColor={backgroundColor}
+        />
       </>
     </ModalContext.Provider>
   );
@@ -134,7 +142,7 @@ function ModalContainer(props) {
             top: 0,
             left: 0,
             zIndex: 1000,
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            backgroundColor: props.backgroundColor,
             display: 'flex',
             justifyContent: 'center',
             boxSizing: 'border-box',
