@@ -7,7 +7,8 @@ import React, {
 } from 'react';
 import { RemoveScrollBar } from 'react-remove-scroll-bar';
 
-const ModalContext = createContext();
+const ModalContainerContext = createContext();
+const ModalUpdatersContext = createContext();
 
 export function ModalProvider({ children }) {
   const [dialog, setDialog] = useState(null);
@@ -61,38 +62,29 @@ export function ModalProvider({ children }) {
 
       return promise;
     },
-
-    handleEscapePress: (e) => {
-      if (e.code === 'Escape') {
-        e.preventDefault();
-        stableUpdaters.current.cancel();
-      }
-    },
   });
 
   // add/remove escape key listener when modal is shown/hidden
+  const stableHandleEscapePress = useRef((e) => {
+    if (e.code === 'Escape') {
+      e.preventDefault();
+      stableUpdaters.current.cancel();
+    }
+  });
   useEffect(() => {
     if (opened) {
-      document.addEventListener(
-        'keyup',
-        stableUpdaters.current.handleEscapePress
-      );
+      document.addEventListener('keyup', stableHandleEscapePress.current);
       return () => {
-        document.removeEventListener(
-          'keyup',
-          stableUpdaters.current.handleEscapePress
-        );
+        document.removeEventListener('keyup', stableHandleEscapePress.current);
       };
     } else {
-      document.removeEventListener(
-        'keyup',
-        stableUpdaters.current.handleEscapePress
-      );
+      document.removeEventListener('keyup', stableHandleEscapePress.current);
     }
   }, [opened]);
 
   const ModalContainer = () => {
     const containerNodeRef = useRef();
+
     if (opened) {
       function handleBackgroundClick(e) {
         if (e.target === containerNodeRef.current) {
@@ -128,21 +120,24 @@ export function ModalProvider({ children }) {
   };
 
   return (
-    <ModalContext.Provider
-      value={{
-        ModalContainer,
-        open: stableUpdaters.current.open,
-        cancel: stableUpdaters.current.cancel,
-        confirm: stableUpdaters.current.confirm,
-      }}
-    >
-      {children}
-    </ModalContext.Provider>
+    <ModalContainerContext.Provider value={ModalContainer}>
+      <ModalUpdatersContext.Provider value={stableUpdaters.current}>
+        {children}
+      </ModalUpdatersContext.Provider>
+    </ModalContainerContext.Provider>
   );
 }
 
+export function useModalContainer() {
+  const context = useContext(ModalContainerContext);
+  if (context === undefined) {
+    throw new Error('useModalContainer must be used within a ModalProvider');
+  }
+  return context;
+}
+
 export function useModal() {
-  const context = useContext(ModalContext);
+  const context = useContext(ModalUpdatersContext);
   if (context === undefined) {
     throw new Error('useModal must be used within a ModalProvider');
   }

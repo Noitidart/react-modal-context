@@ -1,10 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
-import { useModal } from './modal-context';
+import { useModal, useModalContainer } from './modal-context';
 import AlertModal from './AlertModal';
 import RemoteDropdownModal from './RemoteDropdownModal';
 
 function App() {
+  const ModalContainer = useModalContainer();
   const modal = useModal();
 
   const handleOpenAlertModal = async (e) => {
@@ -48,7 +49,7 @@ function App() {
         </header>
         <div style={{ backgroundColor: 'midnightblue', height: '300px' }} />
       </div>
-      <modal.ModalContainer />
+      <ModalContainer />
     </>
   );
 }

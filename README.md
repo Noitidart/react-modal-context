@@ -20,12 +20,12 @@
 
    ```diff
    function App(props) {
-   + const modal = useModal();
+   + const modal = useModalContainer();
 
      return (
    +   <>
          <div className="App" />
-   +      <modal.ModalContainer />
+   +      <ModalContainer />
    +   </>
      )
    }
